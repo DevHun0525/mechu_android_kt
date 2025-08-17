@@ -34,6 +34,7 @@
         android:id="@+id/navigation_main"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        app:labelVisibilityMode="labeled"
         app:itemTextColor="@color/button_icon_color"
         app:itemActiveIndicatorStyle="@style/CustomBottomNavigationViewIndicator"
         app:layout_constraintBottom_toBottomOf="parent"

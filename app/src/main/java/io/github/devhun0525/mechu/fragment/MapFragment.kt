@@ -24,9 +24,13 @@ import com.kakao.vectormap.MapLifeCycleCallback
 import com.kakao.vectormap.MapView
 import com.kakao.vectormap.camera.CameraAnimation
 import com.kakao.vectormap.camera.CameraUpdateFactory
+import com.kakao.vectormap.label.LabelOptions
+import com.kakao.vectormap.label.LabelStyle
+import com.kakao.vectormap.label.LabelStyles
 import io.github.devhun0525.mechu.R
 import io.github.devhun0525.mechu.data.KakaoApiData
 import io.github.devhun0525.mechu.kakaomap.KakaoLocalApiService
+import io.github.devhun0525.mechu.kakaomap.KakaoMapManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -46,81 +50,12 @@ class MapFragment : Fragment() {
     private var kakaoMap: KakaoMap? = null
     private val PERMISSION_REQUEST_CODE = 1001
     private lateinit var fusedLocationClient: FusedLocationProviderClient // FusedLocationProviderClient 선언
-    val KEYWORD_URL: String = "https://dapi.kakao.com/v2/local/search/keyword"
-    val CATEGORY_URL: String = "https://dapi.kakao.com/v2/local/search/category"
-
-    // 1. 로깅 인터셉터 생성 (로그를 상세히 보기 위해 LEVEL_BODY 설정)
-    val loggingInterceptor = HttpLoggingInterceptor().apply {
-        level = HttpLoggingInterceptor.Level.BODY
-    }
-
-    // 2. OkHttpClient에 인터셉터 추가
-    val client = OkHttpClient.Builder()
-        .addInterceptor(loggingInterceptor)
-        .build()
-
-    // retrofit 선언 (BASE URL 설정)
-    val retrofit = Retrofit.Builder()
-        .baseUrl("https://dapi.kakao.com/")
-        .client(client)
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
 
 
-    // retrofit 객체 생성 (인터페이스를 담아야됨)
-    val kakaoApi = retrofit.create(KakaoLocalApiService::class.java)
-
-
-    //요청할 위치 권한 목록입니다.
     private val locationPermissions = arrayOf<String?>(
         Manifest.permission.ACCESS_COARSE_LOCATION,
         Manifest.permission.ACCESS_FINE_LOCATION
     )
-
-    fun categorySearch(x : Double, y : Double, radius : Int){
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                val response = kakaoApi.searchByCategory(
-                    apiKey =  KakaoApiData.HTTP_API_KEY,
-                    categoryGroupCode = "BK9", // 은행
-                    longitude = x,   // 강남역 경도
-                    latitude = y,    // 강남역 위도
-                    radius = radius,              // 1km 반경
-                    rect = "",
-                    page = 1,
-                    size = 15,
-                    sort = "accuracy",
-                )
-
-                if (response.isSuccessful) {
-                    // 성공! UI 업데이트는 Dispatchers.Main 에서
-                    val places = response.body()?.documents
-                    places?.forEach {
-                        Log.d("KakaoSearch", "장소: ${it.place_name}, 주소: ${it.address_name}")
-                    }
-                } else {
-                    Log.w("KakaoSearch", "호출 실패: ${response.message()}")
-                }
-            } catch (e: Exception) {
-                Log.e("KakaoSearch", "오류: ", e)
-            }
-        }
-    }
-
-    // REST API 이용 메서드
-    private fun getJson(apiUrl : String): JSONObject { //requestURL 설정 후 Kakao-API의 response 값 인 json 을 받아오는 메서드
-        var json: String? = ""
-        var client = HttpClientBuilder.create().build();
-        var getRequest = HttpGet(apiUrl); //Get 메소드 URL 생성
-        getRequest.addHeader("Authorization", "KakaoAK " + KakaoApiData.API_KEY); //API KEY 입력
-        var getResponse = client.execute(getRequest); // 위에 보낸 request에 대한 response 내용(json)
-
-        var br = BufferedReader(InputStreamReader(getResponse.getEntity().getContent(), "UTF-8"));
-        json = br.readLine();
-
-
-        return JSONObject(json);
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -140,6 +75,10 @@ class MapFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        mapView = view.findViewById<MapView>(R.id.map_view)
+        locationButton = view.findViewById<Button>(R.id.current_location_button)
+
         showMapView(view)
     }
 
@@ -148,8 +87,7 @@ class MapFragment : Fragment() {
         KakaoMapSdk.init(requireContext(), KakaoApiData.API_KEY)
         Log.w("hun", "apikey : ${KakaoApiData.API_KEY}")
 
-        mapView = view.findViewById<MapView>(R.id.map_view)
-        locationButton = view.findViewById<Button>(R.id.current_location_button)
+
 
         locationButton.setOnClickListener {
             getCurLocation()
@@ -183,31 +121,20 @@ class MapFragment : Fragment() {
         ) // PRIORITY_HIGH_ACCURACY 사용
             .addOnSuccessListener { location ->
                 if (location != null) {
+                    KakaoApiData.location = location;
                     val currentLatLng = LatLng.from(location.latitude, location.longitude)
                     kakaoMap?.moveCamera(
                         CameraUpdateFactory.newCenterPosition(currentLatLng),
-                        CameraAnimation.from(500, true, true)
+                        CameraAnimation.from(10, true, true)
                     )
-                    // 필요한 경우 마커 추가
-//                    kakaoMap?.labelManager?.layer?.addLabel(
-//                        LabelOptions.from(currentLatLng).setStyles(R.drawable.icon_location)
-
 
                     Log.w("MapFragment", "currentLatLng ${currentLatLng}")
 
-                    categorySearch(location.latitude, location.longitude, 1000)
-                    /*// 1. LabelStyles 생성하기 - Icon 이미지 하나만 있는 스타일
-                    var styles =
-                        kakaoMap?.labelManager?.addLabelStyles(LabelStyles.from(LabelStyle.from(R.drawable.icon_location)));
-                    // 2. LabelOptions 생성하기
-                    var options = LabelOptions.from(LatLng.from(currentLatLng)).setStyles(styles)
-                    // 3. LabelLayer 가져오기 (또는 커스텀 Layer 생성)
-                    var layer = kakaoMap?.labelManager?.layer
+                    val options = LabelOptions.from(currentLatLng)
+                    kakaoMap?.labelManager?.layer?.addLabel(options)
 
-                    // 4. LabelLayer 에 LabelOptions 을 넣어 Label 생성하기
-                    var label = layer?.addLabel(options)*/
+                    Log.w("MapFragment", "kakaoMap ${kakaoMap}, kakaoMap ${kakaoMap?.labelManager}, kakaoMap ${kakaoMap?.labelManager?.layer}")
 
-                    Log.w("MapFragment", "Current location is null")
                 } else {
                     Log.w("MapFragment", "Current location is null")
                 }

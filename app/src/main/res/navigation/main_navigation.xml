@@ -6,6 +6,21 @@
     app:startDestination="@id/navigation_home">
     <fragment
         android:id="@+id/navigation_home"
+        android:name="io.github.devhun0525.mechu.fragment.HomeFragment"
+        android:label="fragment_home"
+        tools:layout="@layout/fragment_home" >
+        <action
+            android:id="@+id/action_homeFragment_to_navigation_location"
+            app:destination="@id/navigation_location" />
+        <action
+            android:id="@+id/action_homeFragment_to_navigation_account"
+            app:destination="@id/navigation_account" />
+        <action
+            android:id="@+id/action_homeFragment_to_navigation_heart"
+            app:destination="@id/navigation_heart" />
+    </fragment>
+    <fragment
+        android:id="@+id/navigation_location"
         android:name="io.github.devhun0525.mechu.fragment.MapFragment"
         android:label="fragment_map"
         tools:layout="@layout/fragment_map" >
@@ -14,7 +29,10 @@
             app:destination="@id/navigation_account" />
         <action
             android:id="@+id/action_mapFragment_to_heartListFragment"
-            app:destination="@id/navigation_heart_list" />
+            app:destination="@id/navigation_heart" />
+        <action
+            android:id="@+id/action_navigation_location_to_homeFragment3"
+            app:destination="@id/navigation_home" />
     </fragment>
     <fragment
         android:id="@+id/navigation_account"
@@ -23,22 +41,29 @@
         tools:layout="@layout/fragment_account" >
         <action
             android:id="@+id/action_accountFragment_to_heartListFragment"
-            app:destination="@id/navigation_heart_list" />
+            app:destination="@id/navigation_heart" />
         <action
             android:id="@+id/action_accountFragment_to_mapFragment"
+            app:destination="@id/navigation_location" />
+        <action
+            android:id="@+id/action_navigation_account_to_homeFragment"
             app:destination="@id/navigation_home" />
     </fragment>
     <fragment
-        android:id="@+id/navigation_heart_list"
-        android:name="io.github.devhun0525.mechu.fragment.HeartListFragment"
-        android:label="fragment_heart_list"
-        tools:layout="@layout/fragment_heart_list" >
+        android:id="@+id/navigation_heart"
+        android:name="io.github.devhun0525.mechu.fragment.HeartFragment"
+        android:label="fragment_heart"
+        tools:layout="@layout/fragment_heart" >
         <action
             android:id="@+id/action_heartListFragment_to_accountFragment"
             app:destination="@id/navigation_account" />
         <action
             android:id="@+id/action_heartListFragment_to_mapFragment"
+            app:destination="@id/navigation_location" />
+        <action
+            android:id="@+id/action_navigation_heart_to_homeFragment"
             app:destination="@id/navigation_home" />
     </fragment>
+
 
 </navigation>
