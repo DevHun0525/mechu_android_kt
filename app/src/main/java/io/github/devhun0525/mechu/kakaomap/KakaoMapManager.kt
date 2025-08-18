@@ -33,10 +33,9 @@ open class KakaoMapManager {
 
         // retrofit 객체 생성 (인터페이스를 담아야됨)
         val kakaoApi = retrofit.create(KakaoLocalApiService::class.java)
-
-        fun categorySearch(x : Double, y : Double, radius : Int) {
-
-            var places : List<Place>? = null
+        var place : List<Place>? = null
+        var places : MutableList<Place>? = mutableListOf()
+        fun categorySearch(page : Int, x : Double, y : Double, radius : Int) {
 
             CoroutineScope(Dispatchers.IO).launch {
                 try {
@@ -47,18 +46,22 @@ open class KakaoMapManager {
                         longitude = x,
                         latitude = y,
                         radius = radius,              // 단위: 미터(m), 최소: 0, 최대: 20000
+                        page = page,              // 단위: 미터(m), 최소: 0, 최대: 20000
                         size = 15,              // 단위: 미터(m), 최소: 0, 최대: 20000
                         sort = "distance",
                     )
 
-                    places = response.body()?.documents
+                    place = response.body()?.documents
 
                     if (response.isSuccessful) {
                         // 성공! UI 업데이트는 Dispatchers.Main 에서
-                        places?.forEach {
-                            Log.d("KakaoSearch", "장소: ${it.place_name}, 주소: ${it.address_name}")
+                        place?.forEach {
+                            places?.add(it)
                         }
 
+                        places?.forEach {
+                            Log.d("KakaoSearch", "places: ${it.place_name}, 주소: ${it.address_name}")
+                        }
                         KakaoApiData.placeList = places
                     } else {
                         Log.w("KakaoSearch", "호출 실패: ${response.message()}")

@@ -14,6 +14,7 @@ import androidx.lifecycle.lifecycleScope
 import io.github.devhun0525.mechu.R
 import io.github.devhun0525.mechu.data.KakaoApiData
 import io.github.devhun0525.mechu.kakaomap.KakaoMapManager
+import io.github.devhun0525.mechu.kakaomap.KakaoMapManager.Companion.places
 import io.github.devhun0525.mechu.kakaomap.Place
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -63,11 +64,16 @@ class HomeFragment : Fragment() {
 
         object : Thread() {
             override fun run() {
-                KakaoMapManager.categorySearch(
-                    location.longitude,
-                    location.latitude,
-                    350
-                )
+                places = mutableListOf()
+
+                for(i in 1..3){
+                    KakaoMapManager.categorySearch(
+                        i,
+                        location.longitude,
+                        location.latitude,
+                        350
+                    )
+                }
 
                 // restaurantList 결과를 받은 후에야 아래 코드가 실행됨
                 while (KakaoApiData.placeList == null) {

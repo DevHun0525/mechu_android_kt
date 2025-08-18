@@ -14,7 +14,7 @@ interface KakaoLocalApiService {
             @Query("y") latitude: Double,
             @Query("radius") radius: Int,
 //            @Query("rect") rect: String,
-//            @Query("page") page: Int,
+            @Query("page") page: Int,
             @Query("size") size: Int,
             @Query("sort") sort: String,
         ): Response<CategorySearchResponse>
