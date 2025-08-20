@@ -14,6 +14,7 @@ val properties = Properties().apply {
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -77,6 +78,7 @@ android {
     }
 }
 
+
 dependencies {
 
     implementation(libs.androidx.core.ktx)
@@ -109,4 +111,14 @@ dependencies {
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
     // OkHttp Logging Interceptor (네트워크 로그 확인용 - 선택)
     implementation("com.squareup.okhttp3:logging-interceptor:4.11.0")
+
+
+
+    //firebase
+    implementation(platform("com.google.firebase:firebase-bom:34.1.0"))
+    implementation("com.google.firebase:firebase-auth")
+    implementation("com.google.firebase:firebase-firestore")
+
+    //goggle
+    implementation("com.google.gms:google-services:4.4.3")
 }

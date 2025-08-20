@@ -8,13 +8,19 @@ import androidx.appcompat.widget.Toolbar
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.firebase.Firebase
+import com.google.firebase.FirebaseApp
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.firestore
 import com.kakao.vectormap.KakaoMapSdk
 import io.github.devhun0525.mechu.data.GlobalData
+import io.github.devhun0525.mechu.firebase.FirebaseManager
 
 class MainActivity : AppCompatActivity() {
     var log = "MainActivity"
 
     //    private lateinit var mapView: MapView
+    private lateinit var db: FirebaseFirestore
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,6 +55,9 @@ class MainActivity : AppCompatActivity() {
         navController?.let {
             bottomNavigationView.setupWithNavController(it)
         }
+        FirebaseApp.initializeApp(this)
+        db = Firebase.firestore
+        addTestUserToFirestore()
     }
 
 
@@ -76,6 +85,41 @@ class MainActivity : AppCompatActivity() {
         marker.position = LatLng(37.5666102, 126.9783881)
         marker.map = naverMap
     }*/
+
+    val TAG = "FirebaseManager"
+    //FirebaseFirestore.getInstance()
+
+
+
+
+    fun addTestUserToFirestore(){
+        val user = hashMapOf(
+            "first" to "Ada",
+            "last" to "Lovelace",
+            "born" to 1815,
+        )
+
+        // Add a new document with a generated ID
+        db.collection("users")
+            .add(user)
+            .addOnSuccessListener { documentReference ->
+                Log.d(TAG, "DocumentSnapshot added with ID: ${documentReference.id}")
+            }
+            .addOnFailureListener { e ->
+                Log.w(TAG, "Error adding document", e)
+            }
+
+        /*db.collection("users")
+            .get()
+            .addOnSuccessListener { result ->
+                for (document in result) {
+                    Log.d(TAG, "${document.id} => ${document.data}")
+                }
+            }
+            .addOnFailureListener { exception ->
+                Log.w(TAG, "Error getting documents.", exception)
+            }*/
+    }
 
     override fun onDestroy() {
         super.onDestroy()

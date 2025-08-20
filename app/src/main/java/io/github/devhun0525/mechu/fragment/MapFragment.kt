@@ -4,11 +4,15 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.provider.CalendarContract
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.RadioButton
+import android.widget.RadioGroup
+import android.graphics.Color
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -47,6 +51,8 @@ class MapFragment : Fragment() {
 
     private lateinit var mapView: MapView
     private lateinit var locationButton: Button
+    private lateinit var radioGroup: RadioGroup
+    private var radioButtonList: MutableList<RadioButton> = mutableListOf()
     private var kakaoMap: KakaoMap? = null
     private val PERMISSION_REQUEST_CODE = 1001
     private lateinit var fusedLocationClient: FusedLocationProviderClient // FusedLocationProviderClient 선언
@@ -78,6 +84,7 @@ class MapFragment : Fragment() {
 
         mapView = view.findViewById<MapView>(R.id.map_view)
         locationButton = view.findViewById<Button>(R.id.current_location_button)
+        radioGroup = view.findViewById<RadioGroup>(R.id.options_group)
 
         showMapView(view)
     }
@@ -87,7 +94,22 @@ class MapFragment : Fragment() {
         KakaoMapSdk.init(requireContext(), KakaoApiData.API_KEY)
         Log.w("hun", "apikey : ${KakaoApiData.API_KEY}")
 
+        var optionLength : Int = KakaoApiData.KeywordOptions.entries.size
+        /*for(i in 0..optionLength - 1){
+            radioButtonList.add(RadioButton(requireContext()))
+            radioButtonList[i].text = KakaoApiData.KeywordOptions.entries[i].toString()
+            radioButtonList[i].setTextColor(Color.BLACK)
+            radioGroup.addView(radioButtonList[i])
+        }
+*/
 
+        // ✨ 개선된 방식
+        KakaoApiData.KeywordOptions.entries.forEach { option ->
+            val radioButton = RadioButton(requireContext())
+            radioButton.text = option.keyword // 'option'으로 직접 접근!
+            radioButton.setTextColor(Color.BLACK)
+            radioGroup.addView(radioButton)
+        }
 
         locationButton.setOnClickListener {
             getCurLocation()
@@ -177,8 +199,14 @@ class MapFragment : Fragment() {
     override fun onPause() {
         super.onPause()
         mapView.pause()
-    }
+        Log.e("hun", "@@@@@@@@@@@@@@@@@@ ${radioGroup.checkedRadioButtonId}");
+        var selectedButton = radioGroup.findViewById<RadioButton>(radioGroup.checkedRadioButtonId)
+        if (selectedButton != null) {
+            Log.e("hun", "@@@@@@@@@@@@@@@@@@ ${selectedButton.text}");
+            KakaoApiData.keyword = selectedButton.text.toString()
+        }
 
+    }
     /*override fun onDestroy() {
         super.onDestroy()
         mapView.finish()

@@ -32,7 +32,14 @@
         android:layout_marginEnd="5dp"
         android:layout_marginBottom="5dp"
         />
-
+\
+    <RadioGroup
+        android:id="@+id/options_group"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|center"
+        android:orientation="horizontal">
+    </RadioGroup>
 
 
 </FrameLayout>
