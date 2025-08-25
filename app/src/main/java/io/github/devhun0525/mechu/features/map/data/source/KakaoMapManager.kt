@@ -1,14 +1,19 @@
-package io.github.devhun0525.mechu.kakaomap
+package io.github.devhun0525.mechu.features.map.data.source
 
 import android.util.Log
-import io.github.devhun0525.mechu.data.KakaoApiData
+import io.github.devhun0525.mechu.BuildConfig
+import io.github.devhun0525.mechu.features.map.data.model.KakaoApiData
+import io.github.devhun0525.mechu.kakaomap.KakaoLocalApiService
+import io.github.devhun0525.mechu.kakaomap.CategorySearchResponse
+import io.github.devhun0525.mechu.kakaomap.KakaoLoginResponse
+import io.github.devhun0525.mechu.kakaomap.Login
+import io.github.devhun0525.mechu.kakaomap.Place
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.Response
 
 open class KakaoMapManager {
     companion object {
@@ -23,10 +28,10 @@ open class KakaoMapManager {
             .build()
 
         // retrofit 선언 (BASE URL 설정)
-        val retrofit = Retrofit.Builder()
+        val retrofit = retrofit2.Retrofit.Builder()
             .baseUrl("https://dapi.kakao.com/")
             .client(client)
-            .addConverterFactory(GsonConverterFactory.create())
+            .addConverterFactory(retrofit2.converter.gson.GsonConverterFactory.create())
             .build()
 
 
@@ -38,12 +43,12 @@ open class KakaoMapManager {
 
             CoroutineScope(Dispatchers.IO).launch {
                 try {
-                    val response : retrofit2.Response<CategorySearchResponse>
+                    val response : Response<CategorySearchResponse>
 
-                    if (KakaoApiData.keyword != null) {
+                    if (KakaoApiData.Companion.keyword != null) {
                         response = kakaoApi.searchByKeyword(
-                            query = KakaoApiData.keyword,
-                            apiKey = KakaoApiData.HTTP_API_KEY,
+                            query = KakaoApiData.Companion.keyword,
+                            apiKey = KakaoApiData.Companion.HTTP_API_KEY,
                             categoryGroupCode = "FD6", // 음식점
                             longitude = x,
                             latitude = y,
@@ -54,7 +59,7 @@ open class KakaoMapManager {
                         )
                     } else {
                         response = kakaoApi.searchByCategory(
-                            apiKey = KakaoApiData.HTTP_API_KEY,
+                            apiKey = KakaoApiData.Companion.HTTP_API_KEY,
                             categoryGroupCode = "FD6", // 음식점
                             longitude = x,
                             latitude = y,
@@ -70,6 +75,8 @@ open class KakaoMapManager {
 
                     place = response.body()?.documents
 
+
+
                     if (response.isSuccessful) {
                         // 성공! UI 업데이트는 Dispatchers.Main 에서
                         place?.forEach {
@@ -79,7 +86,7 @@ open class KakaoMapManager {
                         places?.forEach {
                             Log.d("KakaoSearch", "places: ${it.place_name}, 주소: ${it.address_name}")
                         }
-                        KakaoApiData.placeList = places
+                        KakaoApiData.Companion.placeList = places
                     } else {
                         Log.w("KakaoSearch", "호출 실패: ${response.message()}")
                     }

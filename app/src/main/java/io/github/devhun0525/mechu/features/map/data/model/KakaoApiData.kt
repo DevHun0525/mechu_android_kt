@@ -1,8 +1,6 @@
-package io.github.devhun0525.mechu.data
+package io.github.devhun0525.mechu.features.map.data.model
 
 import android.location.Location
-import android.provider.CallLog
-import com.kakao.vectormap.LatLng
 import io.github.devhun0525.mechu.BuildConfig
 import io.github.devhun0525.mechu.kakaomap.Place
 

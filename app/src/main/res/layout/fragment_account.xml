@@ -11,4 +11,37 @@
         android:layout_height="match_parent"
         android:text="@string/hello_blank_fragment" />
 
+    <Button
+        android:id="@+id/google_button"
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        android:text="GOGGLE"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="10dp"
+        android:visibility="gone"
+        />
+
+    <Button
+        android:id="@+id/naver_button"
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        android:text="NAVER"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="60dp"
+        />
+
+    <Button
+        android:id="@+id/kakao_button"
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        android:text="KAKAO"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="110dp"
+        />
+
+
+
 </FrameLayout>

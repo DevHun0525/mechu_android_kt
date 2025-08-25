@@ -19,7 +19,11 @@ dependencyResolutionManagement {
         //naver
 //        maven("https://repository.map.naver.com/archive/maven")
         //kakao
+        //map
         maven(url = uri("https://devrepo.kakao.com/nexus/repository/kakaomap-releases/"))
+        //login
+        maven { url = java.net.URI("https://devrepo.kakao.com/nexus/content/groups/public/") }
+
 //        maven{url = uri("https://devrepo.kakao.com/nexus/content/groups/public/") }
     }
 }

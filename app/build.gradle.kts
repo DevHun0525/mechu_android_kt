@@ -2,7 +2,7 @@
 import java.io.FileInputStream
 import java.util.Properties
 
-//var KAKAO_SDK_VERSION = "2.21.6"
+var KAKAO_SDK_VERSION = "2.21.6"
 
 //var KAKAO_MAP_VERSION = " 2.12.8"
 var KAKAO_MAP_VERSION = "2.9.5"
@@ -51,12 +51,26 @@ android {
             "\"${properties.getProperty("KAKAO_MAPS_REST_API_KEY")}\""
         )
 
+        buildConfigField(
+            "String",
+            "NAVER_CLIENT_ID",
+            "\"${properties.getProperty("NAVER_CLIENT_ID")}\""
+        )
+
+        buildConfigField(
+            "String",
+            "NAVER_CLIENT_SECRET",
+            "\"${properties.getProperty("NAVER_CLIENT_SECRET")}\""
+        )
+
         ndk {
             abiFilters.add("arm64-v8a")
             abiFilters.add("armeabi-v7a")
             abiFilters.add("x86")
             abiFilters.add("x86_64")
         }
+
+        manifestPlaceholders["MY_KAKAO_KEY"] = properties.getProperty("KAKAO_MAPS_REST_API_KEY")
     }
 
     buildTypes {
@@ -94,11 +108,15 @@ dependencies {
 
     //naver map
 //    implementation("com.naver.maps:map-sdk:3.22.1")
+    //naver login
+    implementation("com.navercorp.nid:oauth:5.10.0") // jdk 11
 
     //kakao map
     implementation("com.kakao.maps.open:android:${KAKAO_MAP_VERSION}")
     implementation("com.google.android.gms:play-services-location:21.0.1") // 최신 버전으로 확인해주세요.
 //    implementation("com.kakao.sdk:v2-all:${KAKAO_SDK_VERSION}")
+// 카카오 로그인 API 모듈
+    implementation("com.kakao.sdk:v2-user:${KAKAO_SDK_VERSION}")
 
     // navigation
     implementation("androidx.navigation:navigation-fragment-ktx:2.5.3")
@@ -113,7 +131,6 @@ dependencies {
     implementation("com.squareup.okhttp3:logging-interceptor:4.11.0")
 
 
-
     //firebase
     implementation(platform("com.google.firebase:firebase-bom:34.1.0"))
     implementation("com.google.firebase:firebase-auth")
@@ -121,4 +138,6 @@ dependencies {
 
     //goggle
     implementation("com.google.gms:google-services:4.4.3")
+
+
 }

@@ -8,10 +8,10 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="PLACEHOLDER" />
-                  <option name="mobileSdkAppId" value="" />
-                  <option name="projectId" value="" />
-                  <option name="projectNumber" value="" />
+                  <option name="appId" value="io.github.devhun0525.mechu" />
+                  <option name="mobileSdkAppId" value="1:547195051499:android:638263338cb425fdc20dae" />
+                  <option name="projectId" value="mechu-android-kt" />
+                  <option name="projectNumber" value="547195051499" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />
