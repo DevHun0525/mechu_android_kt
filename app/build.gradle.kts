@@ -15,6 +15,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     id("com.google.gms.google-services")
+    id("org.jetbrains.kotlin.plugin.compose") version libs.versions.kotlin.get()
 }
 
 android {
@@ -32,7 +33,9 @@ android {
 
         android.buildFeatures.buildConfig = true
         android.buildFeatures.viewBinding = true
-
+        buildFeatures {
+            compose = true
+        }
         /*buildConfigField(
             "String",
             "NAVER_MAPS_CLIENT_ID",
@@ -114,8 +117,9 @@ dependencies {
     //kakao map
     implementation("com.kakao.maps.open:android:${KAKAO_MAP_VERSION}")
     implementation("com.google.android.gms:play-services-location:21.0.1") // 최신 버전으로 확인해주세요.
+
+    // 카카오 로그인 API 모듈
 //    implementation("com.kakao.sdk:v2-all:${KAKAO_SDK_VERSION}")
-// 카카오 로그인 API 모듈
     implementation("com.kakao.sdk:v2-user:${KAKAO_SDK_VERSION}")
 
     // navigation
@@ -156,4 +160,21 @@ dependencies {
     // If you want to additionally use the CameraX Extensions library
     implementation("androidx.camera:camera-extensions:${camerax_version}")
 
+
+    // Jetpack Compose
+    val composeBom = platform("androidx.compose:compose-bom:2024.06.00") // BOM 버전 확인
+    implementation(composeBom)
+    androidTestImplementation(composeBom)
+
+    implementation("androidx.compose.ui:ui")
+    implementation("androidx.compose.material3:material3") // Material 3
+    // implementation("androidx.compose.material:material") // Material 2 (M3 권장)
+    implementation("androidx.compose.ui:ui-tooling-preview")
+    debugImplementation("androidx.compose.ui:ui-tooling")
+    debugImplementation("androidx.compose.ui:ui-test-manifest")
+
+    implementation("androidx.activity:activity-compose:1.9.0") // ComponentActivity에서 setContent 사용
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.3") // ViewModel과 Compose 통합
+    val nav_version = "2.9.3"
+    implementation("androidx.navigation:navigation-compose:$nav_version")
 }

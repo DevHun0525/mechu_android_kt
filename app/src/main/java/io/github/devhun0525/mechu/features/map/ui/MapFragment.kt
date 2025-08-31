@@ -3,6 +3,7 @@ package io.github.devhun0525.mechu.fragment
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.pm.PackageManager
+import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -11,7 +12,6 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.RadioButton
 import android.widget.RadioGroup
-import android.graphics.Color
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -30,7 +30,6 @@ import com.kakao.vectormap.camera.CameraAnimation
 import com.kakao.vectormap.camera.CameraUpdateFactory
 import com.kakao.vectormap.label.LabelOptions
 import io.github.devhun0525.mechu.R
-import io.github.devhun0525.mechu.features.map.data.model.CameraManager
 import io.github.devhun0525.mechu.features.map.data.model.KakaoApiData
 
 
@@ -91,6 +90,18 @@ class MapFragment : Fragment() {
 
     }
 
+    /*override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        // Inflate the layout for this fragment
+        return ComposeView(requireContext()).apply {
+            setContent {
+                // FirstScreen(...) EXTRACT FROM HERE
+            }
+        }
+    }*/
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -98,6 +109,7 @@ class MapFragment : Fragment() {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_map, container, false)
     }
+
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -180,9 +192,11 @@ class MapFragment : Fragment() {
                     Log.w("MapFragment", "currentLatLng ${currentLatLng}")
 
                     val options = LabelOptions.from(currentLatLng)
-                    kakaoMap?.labelManager?.layer?.addLabel(options)
+                    if(kakaoMap != null && kakaoMap?.labelManager != null){
+                        kakaoMap?.labelManager?.layer?.addLabel(options)
+                        Log.w("MapFragment", "kakaoMap ${kakaoMap}, kakaoMap ${kakaoMap?.labelManager}, kakaoMap ${kakaoMap?.labelManager?.layer}")
+                    }
 
-                    Log.w("MapFragment", "kakaoMap ${kakaoMap}, kakaoMap ${kakaoMap?.labelManager}, kakaoMap ${kakaoMap?.labelManager?.layer}")
 
                 } else {
                     Log.w("MapFragment", "Current location is null")
@@ -262,3 +276,27 @@ class MapFragment : Fragment() {
     }
 }
 
+
+//@Composable
+//fun SampleNavHost(
+//    navController: NavHostController
+//) {
+//    NavHost(navController = navController, startDestination = GlobalData.First.toString()) {
+//        composable<GlobalData.First> {
+////            FirstScreen(/* ... */) // EXTRACT TO HERE
+//        }
+//        composable<GlobalData.Second> {
+////            SecondScreen(/* ... */)
+//        }
+//        // ...
+//    }
+//}
+//
+//@Composable
+//fun FirstScreen(
+//    // viewModel: FirstViewModel = viewModel(),
+//    viewModel: FirstViewModel = hiltViewModel(),
+//    onButtonClick: () -> Unit = {},
+//) {
+//    // ...
+//}

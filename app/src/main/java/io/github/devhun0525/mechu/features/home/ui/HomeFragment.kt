@@ -4,27 +4,17 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
-import androidx.fragment.app.Fragment
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
-import androidx.activity.result.launch
-import androidx.compose.ui.semantics.text
-import androidx.lifecycle.lifecycleScope
+import androidx.fragment.app.Fragment
 import io.github.devhun0525.mechu.R
 import io.github.devhun0525.mechu.features.map.data.model.KakaoApiData
 import io.github.devhun0525.mechu.features.map.data.source.KakaoMapManager
 import io.github.devhun0525.mechu.features.map.data.source.KakaoMapManager.Companion.places
-import io.github.devhun0525.mechu.kakaomap.Place
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
-import kotlin.random.Random
-import kotlin.text.append
 
 class HomeFragment : Fragment() {
     var restaurantListTextView: TextView? = null
@@ -47,6 +37,9 @@ class HomeFragment : Fragment() {
 
         restaurantListTextView = view.findViewById<TextView>(R.id.restaurant_list_text)
         randomButton = view.findViewById<Button>(R.id.random_button)
+
+        randomButton?.gravity = Gravity.BOTTOM
+        randomButton?.gravity = Gravity.END
 
         randomButton?.setOnClickListener {
             restaurantListTextView?.text = ""
@@ -83,13 +76,16 @@ class HomeFragment : Fragment() {
                     Thread.sleep(1000)
                 }
 
-                Log.e("HomeFragment", "API 호출 결과: ${KakaoApiData.placeList}")
-                Handler(Looper.getMainLooper()).post {
-                    restaurantListTextView?.text = ""
-                    KakaoApiData.placeList?.forEach { place ->
-                        restaurantListTextView?.append("${place.place_name}\n")
+                if(KakaoApiData.placeList != null){
+                    Log.e("HomeFragment", "API 호출 결과: ${KakaoApiData.placeList}")
+                    Handler(Looper.getMainLooper()).post {
+                        restaurantListTextView?.text = ""
+                        KakaoApiData.placeList?.forEach { place ->
+                            restaurantListTextView?.append("${place.place_name}\n")
+                        }
                     }
                 }
+
             }
         }.start()
 
