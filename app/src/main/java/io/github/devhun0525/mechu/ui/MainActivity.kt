@@ -1,7 +1,7 @@
 package io.github.devhun0525.mechu
 
 import android.os.Bundle
-import android.view.View // Added for View.generateViewId()
+import android.view.View
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,21 +12,24 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember // Added for remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalContext // Added for LocalContext
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.viewinterop.AndroidView // Added for AndroidView
-import androidx.fragment.app.Fragment // Added for Fragment
-import androidx.fragment.app.FragmentContainerView // Added for FragmentContainerView
-import androidx.fragment.app.commit // Added for commit
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentContainerView
+import androidx.fragment.app.commit
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
@@ -47,6 +50,7 @@ sealed class Screen(val route: String, val label: String, val icon: ImageVector)
     object Account : Screen("account", "Account", Icons.Filled.AccountCircle)
 }
 
+
 val items = listOf(
     Screen.Home,
     Screen.Map,
@@ -62,7 +66,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             MechuAndroidKtTheme {
-                MainScreen(modifier = Modifier.fillMaxSize())
+                MainScreen()
             }
         }
     }
@@ -75,35 +79,28 @@ class MainActivity : AppCompatActivity() {
 @Composable
 fun DisplayFragment(modifier: Modifier = Modifier, fragmentInstance: Fragment) {
     val context = LocalContext.current
-    val fragmentManager = (context as? AppCompatActivity)?.supportFragmentManager
-        ?: return // Early return if context is not an AppCompatActivity or fragmentManager is null
-
-    // It's important to use a stable and unique ID for the FragmentContainerView
-    // if multiple instances of DisplayFragment might be composed simultaneously
-    // with different fragments. For NavHost, this specific remember might not be strictly
-    // necessary as NavHost manages recomposition, but it's good practice.
-    val containerId = remember { View.generateViewId() }
+    val fragmentManager = (context as? AppCompatActivity)?.supportFragmentManager ?: return
+    val containerId = rememberSaveable { View.generateViewId() }
 
     AndroidView(
-        factory = { ctx ->
-            FragmentContainerView(ctx).apply { id = containerId }
+        modifier = Modifier.fillMaxSize(),
+        factory = { context ->
+            FragmentContainerView(context).apply { id = containerId }
         },
         update = { view ->
             fragmentManager.commit {
                 replace(view.id, fragmentInstance)
             }
         },
-        modifier = modifier
     )
 }
 
 @Composable
-fun MainScreen(modifier: Modifier) {
+fun MainScreen() {
     val navController = rememberNavController()
 
     MechuAndroidKtTheme {
         Scaffold(
-            modifier = modifier,
             bottomBar = {
                 NavigationBar {
                     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -121,7 +118,12 @@ fun MainScreen(modifier: Modifier) {
                                     launchSingleTop = true
                                     restoreState = true
                                 }
-                            }
+                            },
+                            colors = NavigationBarItemDefaults.colors(
+                                selectedIconColor = MaterialTheme.colorScheme.primary,
+                                selectedTextColor = MaterialTheme.colorScheme.primary,
+                                indicatorColor = Color.Transparent
+                            )
                         )
                     }
                 }
@@ -132,10 +134,10 @@ fun MainScreen(modifier: Modifier) {
                 startDestination = Screen.Home.route,
                 Modifier.padding(innerPadding)
             ) {
-                composable(Screen.Home.route) { DisplayFragment(modifier = Modifier.fillMaxSize(), fragmentInstance = HomeFragment()) }
-                composable(Screen.Map.route) { DisplayFragment(modifier = Modifier.fillMaxSize(), fragmentInstance = MapFragment()) }
-                composable(Screen.Heart.route) { DisplayFragment(modifier = Modifier.fillMaxSize(), fragmentInstance = HeartFragment()) }
-                composable(Screen.Account.route) { DisplayFragment(modifier = Modifier.fillMaxSize(), fragmentInstance = AccountFragment()) }
+                composable(Screen.Home.route) { DisplayFragment(fragmentInstance = HomeFragment()) }
+                composable(Screen.Map.route) { DisplayFragment(fragmentInstance = MapFragment()) }
+                composable(Screen.Heart.route) { DisplayFragment(fragmentInstance = HeartFragment()) }
+                composable(Screen.Account.route) { DisplayFragment(fragmentInstance = AccountFragment()) }
             }
         }
     }
@@ -145,9 +147,6 @@ fun MainScreen(modifier: Modifier) {
 @Composable
 fun Preview() {
     MechuAndroidKtTheme {
-        // Previewing MainScreen with actual fragments might be complex or not fully work
-        // as fragments have their own lifecycle and context requirements.
-        // Consider creating a simpler preview or a preview that mocks fragment content.
-        Text("MainScreen Preview (Fragment display might not work here)")
+        MainScreen()
     }
 }

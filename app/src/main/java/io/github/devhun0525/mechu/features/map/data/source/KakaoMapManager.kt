@@ -37,7 +37,6 @@ open class KakaoMapManager {
         var place: List<Place>? = null
         var places: MutableList<Place>? = mutableListOf()
         fun categorySearch(page: Int, x: Double, y: Double, radius: Int) {
-            places = mutableListOf()
 
             CoroutineScope(Dispatchers.IO).launch {
                 try {
