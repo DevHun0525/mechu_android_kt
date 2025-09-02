@@ -16,6 +16,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -25,14 +26,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import io.github.devhun0525.mechu.features.map.data.model.KakaoApiData
-import io.github.devhun0525.mechu.features.map.data.source.KakaoMapManager
-import io.github.devhun0525.mechu.features.map.data.source.KakaoMapManager.Companion.places
+import io.github.devhun0525.mechu.features.map.data.model.KakaoViewModel
 import io.github.devhun0525.mechu.kakaomap.Place
 
 class HomeFragment : Fragment() {
+    val viewModel: KakaoViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+//        lifecycleScope.launch {
+
+//        }
+
     }
 
     override fun onCreateView(
@@ -41,7 +49,9 @@ class HomeFragment : Fragment() {
     ): View {
         return ComposeView(requireContext()).apply {
             setContent {
-                HomeScreen(modifier = Modifier.fillMaxSize(), KakaoApiData.placeList)
+
+                val uiState by viewModel.uiState.collectAsState()
+                HomeScreen(modifier = Modifier.fillMaxSize(), uiState.places)
             }
         }
     }
@@ -53,7 +63,7 @@ class HomeFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         Log.e("hun", "onResume")
-        refreshRestaurantList()
+//        refreshRestaurantList()
     }
 
     private fun refreshRestaurantList() {
@@ -61,16 +71,10 @@ class HomeFragment : Fragment() {
 
         object : Thread() {
             override fun run() {
-                places = mutableListOf()
+//                places = mutableListOf()
 
-                for(i in 1..3){
-                    KakaoMapManager.categorySearch(
-                        i,
-                        location.longitude,
-                        location.latitude,
-                        350
-                    )
-                }
+
+
 
                 while (KakaoApiData.placeList == null) {
                     Log.e("HomeFragment", "API 호출 결과: ${KakaoApiData.placeList}")
