@@ -28,7 +28,11 @@ import com.kakao.vectormap.MapLifeCycleCallback
 import com.kakao.vectormap.MapView
 import com.kakao.vectormap.camera.CameraAnimation
 import com.kakao.vectormap.camera.CameraUpdateFactory
-import com.kakao.vectormap.label.LabelOptions
+import com.kakao.vectormap.mapwidget.InfoWindowOptions
+import com.kakao.vectormap.mapwidget.component.GuiImage
+import com.kakao.vectormap.mapwidget.component.GuiLayout
+import com.kakao.vectormap.mapwidget.component.GuiText
+import com.kakao.vectormap.mapwidget.component.Orientation
 import io.github.devhun0525.mechu.R
 import io.github.devhun0525.mechu.features.map.data.model.KakaoApiData
 
@@ -127,7 +131,7 @@ class MapFragment : Fragment() {
         KakaoMapSdk.init(requireContext(), KakaoApiData.API_KEY)
         Log.w("hun", "apikey : ${KakaoApiData.API_KEY}")
 
-        var optionLength : Int = KakaoApiData.KeywordOptions.entries.size
+        var optionLength: Int = KakaoApiData.KeywordOptions.entries.size
         /*for(i in 0..optionLength - 1){
             radioButtonList.add(RadioButton(requireContext()))
             radioButtonList[i].text = KakaoApiData.KeywordOptions.entries[i].toString()
@@ -191,10 +195,45 @@ class MapFragment : Fragment() {
 
                     Log.w("MapFragment", "currentLatLng ${currentLatLng}")
 
-                    val options = LabelOptions.from(currentLatLng)
-                    if(kakaoMap != null && kakaoMap?.labelManager != null){
-                        kakaoMap?.labelManager?.layer?.addLabel(options)
-                        Log.w("MapFragment", "kakaoMap ${kakaoMap}, kakaoMap ${kakaoMap?.labelManager}, kakaoMap ${kakaoMap?.labelManager?.layer}")
+
+                    if (kakaoMap != null && kakaoMap?.labelManager != null) {
+                        Log.w(
+                            "MapFragment",
+                            "kakaoMap ${kakaoMap}, kakaoMap ${kakaoMap?.labelManager}, kakaoMap ${kakaoMap?.labelManager?.layer}"
+                        )
+
+                        // InfoWindow
+                        val body = GuiLayout(Orientation.Horizontal)
+                        body.setPadding(20, 20, 20, 18)
+
+                        //only image
+                        val bgImage = GuiImage(R.drawable.test, true);
+                        bgImage.setFixedArea(7, 7, 7, 7) // 말풍선 이미지 각 모서리의 둥근 부분만큼(7px)은 늘어나지 않도록 고정.
+                        body.setBackground(bgImage)
+
+                        val text = GuiText("InfoWindow!")
+                        text.setTextSize(30)
+                        val myRedColor = 0xFFFF0000 // Fully opaque red
+                        text.textColor = myRedColor.toInt()
+                        body.addView(text)
+                        val options = InfoWindowOptions.from(currentLatLng)
+                        options.setBody(body)
+                        options.setBodyOffset(0f, -4f) // Body 와 겹치게 -4px 만큼 올려줌.
+//                        val options2 = options.setTail(GuiImage(R.drawable.icon_search, false));
+                        kakaoMap?.mapWidgetManager?.infoWindowLayer?.addInfoWindow(options)
+
+
+                        // label
+                        /*val styles = LabelStyles.from(LabelStyle.from(R.drawable.icon_heart).setZoomLevel(0),
+                        LabelStyle.from(R.drawable.icon_heart).setTextStyles(15, Color.BLACK).setZoomLevel(5),
+                        LabelStyle.from(R.drawable.icon_heart).setZoomLevel(10))
+
+                        val style = kakaoMap?.labelManager?.addLabelStyles(styles)
+                        val options = LabelOptions.from(currentLatLng).setStyles(style)
+                        val layer = kakaoMap?.labelManager?.layer
+                        val label = layer?.addLabel(options)
+                        label?.changeStyles(LabelStyles.from(LabelStyle.from(R.drawable.icon_camera)));
+                        label?.changeText("안녕하세요!")*/
                     }
 
 
@@ -248,6 +287,7 @@ class MapFragment : Fragment() {
         }
 
     }
+
     /*override fun onDestroy() {
         super.onDestroy()
         mapView.finish()
@@ -264,7 +304,8 @@ class MapFragment : Fragment() {
             }
             // 권한이 필요한 이유를 사용자에게 설명해야 하는 경우 (옵션)
             shouldShowRequestPermissionRationale(Manifest.permission.CAMERA) -> {
-                Toast.makeText(requireContext(), "카메라 기능을 사용하려면 권한이 필요합니다.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "카메라 기능을 사용하려면 권한이 필요합니다.", Toast.LENGTH_SHORT)
+                    .show()
                 // 다시 권한 요청
                 requestCameraPermissionLauncher.launch(Manifest.permission.CAMERA)
             }
