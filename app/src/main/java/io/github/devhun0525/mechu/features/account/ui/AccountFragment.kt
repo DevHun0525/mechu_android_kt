@@ -9,10 +9,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
+import androidx.room.Room
 import com.kakao.sdk.auth.model.OAuthToken
 import com.kakao.sdk.common.KakaoSdk
 import com.kakao.sdk.common.model.ClientError
@@ -21,11 +23,15 @@ import com.kakao.sdk.user.UserApiClient
 import com.navercorp.nid.NaverIdLoginSDK
 import io.github.devhun0525.mechu.BuildConfig
 import io.github.devhun0525.mechu.R
+import io.github.devhun0525.mechu.data.GlobalData.Companion.kakaoLoginToken
+import io.github.devhun0525.mechu.data.GlobalData.Companion.naverLoginToken
 import io.github.devhun0525.mechu.databinding.FragmentAccountBinding
+import io.github.devhun0525.mechu.features.account.data.AppDatabase
+import io.github.devhun0525.mechu.features.account.data.User
 import io.github.devhun0525.mechu.features.map.data.model.KakaoApiData
-import io.github.devhun0525.mechu.features.map.data.source.KakaoMapManager.Companion.loggingInterceptor
-import io.github.devhun0525.mechu.kakaomap.KakaoLocalApiService
-import okhttp3.OkHttpClient
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -36,14 +42,13 @@ import okhttp3.OkHttpClient
  * create an instance of this fragment.
  */
 class AccountFragment : Fragment() {
+    var uid = 0
     // TODO: Rename and change types of parameters
     private var _binding: FragmentAccountBinding? = null
     private val binding get() = _binding!!
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        arguments?.let {
 
-        }
     }
 
     override fun onCreateView(
@@ -58,6 +63,8 @@ class AccountFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         KakaoSdk.init(view.context, KakaoApiData.API_KEY)
         NaverIdLoginSDK.initialize(view.context, BuildConfig.NAVER_CLIENT_ID, BuildConfig.NAVER_CLIENT_SECRET, "mechu")
+
+
 
         view.findViewById<Button>(R.id.kakao_button).setOnClickListener {
             // 카카오톡으로 로그인
@@ -85,6 +92,7 @@ class AccountFragment : Fragment() {
                         UserApiClient.instance.loginWithKakaoAccount(view.context, callback = callback)
                     } else if (token != null) {
                         Log.i("hun", "카카오톡으로 로그인 성공 ${token.accessToken}")
+                        kakaoLoginToken = token.accessToken
                     }
                 }
             } else {
@@ -102,6 +110,8 @@ class AccountFragment : Fragment() {
 //                        binding.tvExpires.text = NaverIdLoginSDK.getExpiresAt().toString()
 //                        binding.tvType.text = NaverIdLoginSDK.getTokenType()
 //                        binding.tvState.text = NaverIdLoginSDK.getState().toString()
+
+                    naverLoginToken = NaverIdLoginSDK.getAccessToken()
                 }
                 RESULT_CANCELED -> {
                     // 실패 or 에러
@@ -117,6 +127,33 @@ class AccountFragment : Fragment() {
         view.findViewById<Button>(R.id.google_button).setOnClickListener {
 
         }
+
+
+        /*val scope = CoroutineScope(CoroutineContext *//* Dispatchers.Main과 같은*//* )
+        val job = scope.launch{
+
+        }*/
+        val db = Room.databaseBuilder(
+            view.context,
+            AppDatabase::class.java, "database-name"
+        ).build()
+        val userDao = db.userDao()
+
+        CoroutineScope(Dispatchers.Default).launch {
+            userDao.insertAll(User(1, kakaoLoginToken, naverLoginToken))
+            val users: List<User> = userDao.getAll()
+            for (user in users) {
+                Log.e("hun", "users : " + user.uid)
+                Log.e("hun", "users : " + user.kakaoLoginToken)
+                Log.e("hun", "users : " + user.naverLoginToken)
+            }
+        }
+
+        val userInfo = "kakaoLoginToken ${kakaoLoginToken} + naverLoginToken ${naverLoginToken}"
+        view.findViewById<TextView>(R.id.login_text).text = userInfo
     }
+
+
+
 
 }

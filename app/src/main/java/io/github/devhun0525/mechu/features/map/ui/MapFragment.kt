@@ -206,8 +206,8 @@ class MapFragment : Fragment() {
                         val body = GuiLayout(Orientation.Horizontal)
                         body.setPadding(20, 20, 20, 18)
 
-                        //only image
-                        val bgImage = GuiImage(R.drawable.test, true);
+                        // only image
+                        val bgImage = GuiImage(R.drawable.solid_white, true);
                         bgImage.setFixedArea(7, 7, 7, 7) // 말풍선 이미지 각 모서리의 둥근 부분만큼(7px)은 늘어나지 않도록 고정.
                         body.setBackground(bgImage)
 

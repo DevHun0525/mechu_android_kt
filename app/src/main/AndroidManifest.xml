@@ -33,11 +33,14 @@
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
-
-                <!-- 이거 있던 이유가 뭐더라 리다이렉트 URI: "kakao${NATIVE_APP_KEY}://oauth" -->
-
-                <!--<data android:host="oauth"
-                    android:scheme="kakao${MY_KAKAO_KEY}" />-->
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <!--intent-filter로 묶으지 않으면 앱이 보이지 않는 오류가 있음-->
+                <data android:host="oauth"
+                    android:scheme="kakao${MY_KAKAO_KEY}" />
             </intent-filter>
         </activity>
         <meta-data
